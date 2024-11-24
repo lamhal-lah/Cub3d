@@ -6,7 +6,7 @@
 /*   By: lamhal <lamhal@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/16 18:18:35 by yessemna          #+#    #+#             */
-/*   Updated: 2024/11/18 14:36:20 by lamhal           ###   ########.fr       */
+/*   Updated: 2024/11/24 11:55:51 by lamhal           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,10 +61,17 @@ typedef	struct s_cor
 	int	y;
 }	t_cor;
 
+typedef	struct s_pos
+{
+	double	x;
+	double	y;
+}	t_pos;
+
+
 typedef struct s_player
 {
-	int		x;
-	int		y;
+	double		x;
+	double		y;
 	char	dir;
 }	t_player;
 
@@ -72,14 +79,16 @@ typedef struct s_player
 typedef struct s_mlx
 {
 	mlx_image_t		*img;	// the image
-	mlx_image_t		*img_p;
+	mlx_image_t		*img_r;
 	mlx_image_t		*img_m;
+	mlx_image_t		*img_p;
 	mlx_t			*mlx_p;	// the mlx pointer
 }	t_mlx;
 
 typedef struct s_data
 {
 	t_player	player;
+	t_player	tmp_pl;
 	t_color		floor;
 	t_color		ciel;
 	t_map		map;
@@ -93,6 +102,9 @@ typedef struct s_data
 	char		*we;
 	int			clr;
 	int			scale;
+	double		ang;
+	double		ray_dst;
+	int			ver;
 }	t_data;
 
 typedef struct s_list
@@ -196,8 +208,11 @@ void	ft_hexap(unsigned long long n, int *count, char *HEXA_);
 // reycasting
 
 // bresnhamm
-void	draw_line(t_cor a, t_cor b, t_data *data);
+void	draw_line(t_cor a, t_cor b, t_data *data, int stuts);
 void    draw_map(t_data *data);
+void	start_game(t_data *data);
+void	ray_cast(t_data	*data);
+// void	start_game1(t_data *data);
 
 
 #endif
