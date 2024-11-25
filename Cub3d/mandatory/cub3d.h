@@ -6,7 +6,7 @@
 /*   By: lamhal <lamhal@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/16 18:18:35 by yessemna          #+#    #+#             */
-/*   Updated: 2024/11/24 11:55:51 by lamhal           ###   ########.fr       */
+/*   Updated: 2024/11/25 12:01:31 by lamhal           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,6 +89,7 @@ typedef struct s_data
 {
 	t_player	player;
 	t_player	tmp_pl;
+	t_player	tmp_pl1;
 	t_color		floor;
 	t_color		ciel;
 	t_map		map;
@@ -101,7 +102,8 @@ typedef struct s_data
 	char		**map_dtls;
 	char		*we;
 	int			clr;
-	int			scale;
+	double		scale;
+	double		unite;
 	double		ang;
 	double		ray_dst;
 	int			ver;
@@ -213,6 +215,9 @@ void    draw_map(t_data *data);
 void	start_game(t_data *data);
 void	ray_cast(t_data	*data);
 // void	start_game1(t_data *data);
+t_player   pos_in_map(t_player pl);
+double	ft_normalize(double ang);
+double	set_angle(t_player pl);
 
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: lamhal <lamhal@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 16:02:22 by lamhal            #+#    #+#             */
-/*   Updated: 2024/11/24 15:10:13 by lamhal           ###   ########.fr       */
+/*   Updated: 2024/11/25 16:02:57 by lamhal           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,11 +49,6 @@ void	draw_rect(t_data *data, int x, int y, int scale)
             mlx_put_pixel(data->mlx.img_m, tmp_x + i, tmp_y + j, data->clr);
             j++;
         }
-		// a.x = x * scale ;
-		// a.y = y * scale + i;
-		// b.x = x * scale + scale;
-		// b.y = y * scale + i;
-		// draw_line(a, b, data, 0);
 		i++;
 	}
 }
@@ -115,7 +110,11 @@ void	draw_player(mlx_image_t *img, int x_pl, int y_pl)
 void	render_2d(t_data *data)
 {
     draw_map(data);
+	data->tmp_pl.x = data->player.x * data->unite;
+	data->tmp_pl.y = data->player.y * data->unite;
 	draw_player(data->mlx.img_m, data->tmp_pl.x, data->tmp_pl.y);
+	
+	ray_cast(data);
     mlx_image_to_window(data->mlx.mlx_p, data->mlx.img_m, 0, 0);
 }
 
@@ -140,10 +139,10 @@ void	clear_image(t_data *data)
 
 int	check_hitt_wall(t_data *data, double x, double y)
 {
-	int i = x / data->scale;
-	int j = y / data->scale;
+	int i = x / TILE_SIZE;
+	int j = y / TILE_SIZE;
 	if (data->map.map[j][i] == '0')
-		return (5);
+		return (10);
 	return (0);
 }
 
@@ -153,18 +152,20 @@ void	handell_keys(void *pram)
 
 	data = (t_data *)pram;
 	if (mlx_is_key_down(data->mlx.mlx_p, MLX_KEY_W))
-		data->tmp_pl.y -= check_hitt_wall(data, data->tmp_pl.x, data->tmp_pl.y - 5);
+		data->player.y -= check_hitt_wall(data, data->player.x, data->player.y - 10);
 	if (mlx_is_key_down(data->mlx.mlx_p, MLX_KEY_S))
-		data->tmp_pl.y += check_hitt_wall(data, data->tmp_pl.x, data->tmp_pl.y + 5);;
+		data->player.y += check_hitt_wall(data, data->player.x, data->player.y + 10);;
 	if (mlx_is_key_down(data->mlx.mlx_p, MLX_KEY_A))
-		data->tmp_pl.x -= check_hitt_wall(data, data->tmp_pl.x - 5, data->tmp_pl.y);;
+		data->player.x -= check_hitt_wall(data, data->player.x - 10, data->player.y);;
 	if (mlx_is_key_down(data->mlx.mlx_p, MLX_KEY_D))
-		data->tmp_pl.x += check_hitt_wall(data, data->tmp_pl.x + 5, data->tmp_pl.y);;
+		data->player.x += check_hitt_wall(data, data->player.x + 10, data->player.y);;
 	if (mlx_is_key_down(data->mlx.mlx_p, MLX_KEY_LEFT))
 		data->ang -= M_PI / 180;
 	if (mlx_is_key_down(data->mlx.mlx_p, MLX_KEY_RIGHT))
 		data->ang += M_PI / 180;
+	data->ang = ft_normalize(data->ang);
 	clear_image(data);
+	
 	render_2d(data);
 }
 
@@ -191,11 +192,15 @@ void	handell_keys(void *pram)
 
 void	start_game(t_data *data)
 {
+	data->player = pos_in_map(data->player);
+	// printf("%f %f\n", data->player.x, data->player.y);
+    data->ang = set_angle(data->player);
     data->mlx.mlx_p = mlx_init(S_W, S_H, "cub3d", 0);
     data->mlx.img_m = mlx_new_image(data->mlx.mlx_p, S_W, S_H);
 	data->scale = calculate_scale(data);
-	data->tmp_pl.x = data->player.x * data->scale + (data->scale / 2);
-	data->tmp_pl.y = data->player.y * data->scale + (data->scale / 2);
+	data->unite = data->scale / TILE_SIZE;
+	printf("---%f\n", data->unite);
+	
 	render_2d(data);
     mlx_loop_hook(data->mlx.mlx_p, handell_keys, data);
     mlx_loop(data->mlx.mlx_p);
