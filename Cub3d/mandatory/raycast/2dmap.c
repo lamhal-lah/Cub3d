@@ -6,7 +6,7 @@
 /*   By: lamhal <lamhal@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 16:02:22 by lamhal            #+#    #+#             */
-/*   Updated: 2024/11/25 16:02:57 by lamhal           ###   ########.fr       */
+/*   Updated: 2024/11/26 11:55:45 by lamhal           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,21 +129,50 @@ void	clear_image(t_data *data)
 	int j;
 
 	j = -1;
-	while (++j <= S_H)
+	while (++j < S_H)
 	{
 		i = -1;
-		while (++i <= S_W)
-			mlx_put_pixel(data->mlx.img_m, i, j, get_coller(0, 0, 0, 0));		
+		while (++i < S_W)
+			mlx_put_pixel(data->mlx.img_r, i, j, get_coller(0, 0, 0, 0));		
 	}
 }
 
-int	check_hitt_wall(t_data *data, double x, double y)
+int	check_map(t_data *data, double x, double y)
 {
 	int i = x / TILE_SIZE;
 	int j = y / TILE_SIZE;
 	if (data->map.map[j][i] == '0')
-		return (10);
+		return (1);
 	return (0);
+}
+
+
+void	move_front_back(t_data *data, int dirc)
+{
+	t_pos	pos;
+
+	
+	pos.x = data->player.x + dirc * mov_speed * cos(data->ang);
+	pos.y = data->player.y + dirc *  mov_speed * sin(data->ang);
+	if (check_map(data, pos.x, pos.y))
+	{
+		data->player.x = pos.x;
+		data->player.y = pos.y;
+	}
+}
+
+void	move_right_left(t_data *data, int dirc)
+{
+	t_pos	pos;
+
+	
+	pos.x = data->player.x + mov_speed * cos(data->ang + dirc * M_PI / 2);
+	pos.y = data->player.y + mov_speed * sin(data->ang + dirc * M_PI / 2);
+	if (check_map(data, pos.x, pos.y))
+	{
+		data->player.x = pos.x;
+		data->player.y = pos.y;
+	}
 }
 
 void	handell_keys(void *pram)
@@ -152,56 +181,34 @@ void	handell_keys(void *pram)
 
 	data = (t_data *)pram;
 	if (mlx_is_key_down(data->mlx.mlx_p, MLX_KEY_W))
-		data->player.y -= check_hitt_wall(data, data->player.x, data->player.y - 10);
+		move_front_back(data, 1);
 	if (mlx_is_key_down(data->mlx.mlx_p, MLX_KEY_S))
-		data->player.y += check_hitt_wall(data, data->player.x, data->player.y + 10);;
+		move_front_back(data, -1);
 	if (mlx_is_key_down(data->mlx.mlx_p, MLX_KEY_A))
-		data->player.x -= check_hitt_wall(data, data->player.x - 10, data->player.y);;
+		move_right_left(data, -1);
 	if (mlx_is_key_down(data->mlx.mlx_p, MLX_KEY_D))
-		data->player.x += check_hitt_wall(data, data->player.x + 10, data->player.y);;
+		move_right_left(data, 1);
 	if (mlx_is_key_down(data->mlx.mlx_p, MLX_KEY_LEFT))
-		data->ang -= M_PI / 180;
+		data->ang -= M_PI / 50;
 	if (mlx_is_key_down(data->mlx.mlx_p, MLX_KEY_RIGHT))
-		data->ang += M_PI / 180;
+		data->ang += M_PI / 50;
 	data->ang = ft_normalize(data->ang);
 	clear_image(data);
-	
-	render_2d(data);
+	// render_2d(data);
+	ray_cast(data);
 }
-
-// void	handell_keys(void *pram)
-// {
-// 	t_data	*data;
-
-// 	data = (t_data *)pram;
-// 	if (mlx_is_key_down(data->mlx.mlx_p, MLX_KEY_W))
-// 		data->tmp_pl.y -= 5;
-// 	if (mlx_is_key_down(data->mlx.mlx_p, MLX_KEY_S))
-// 		data->tmp_pl.y += 5;
-// 	if (mlx_is_key_down(data->mlx.mlx_p, MLX_KEY_A))
-// 		data->tmp_pl.x -= 5;
-// 	if (mlx_is_key_down(data->mlx.mlx_p, MLX_KEY_D))
-// 		data->tmp_pl.x += 5;
-// 	if (mlx_is_key_down(data->mlx.mlx_p, MLX_KEY_LEFT))
-// 		data->ang -= M_PI / 180;
-// 	if (mlx_is_key_down(data->mlx.mlx_p, MLX_KEY_RIGHT))
-// 		data->ang += M_PI / 180;
-// 	clear_image(data);
-// 	render_2d(data);
-// }
 
 void	start_game(t_data *data)
 {
 	data->player = pos_in_map(data->player);
-	// printf("%f %f\n", data->player.x, data->player.y);
     data->ang = set_angle(data->player);
     data->mlx.mlx_p = mlx_init(S_W, S_H, "cub3d", 0);
-    data->mlx.img_m = mlx_new_image(data->mlx.mlx_p, S_W, S_H);
+    // data->mlx.img_m = mlx_new_image(data->mlx.mlx_p, S_W, S_H);
+    data->mlx.img_r = mlx_new_image(data->mlx.mlx_p, S_W, S_H);
 	data->scale = calculate_scale(data);
 	data->unite = data->scale / TILE_SIZE;
-	printf("---%f\n", data->unite);
-	
-	render_2d(data);
+	// render_2d(data);
+	ray_cast(data);
     mlx_loop_hook(data->mlx.mlx_p, handell_keys, data);
     mlx_loop(data->mlx.mlx_p);
 }

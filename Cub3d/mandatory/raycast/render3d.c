@@ -6,7 +6,7 @@
 /*   By: lamhal <lamhal@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/24 15:33:41 by lamhal            #+#    #+#             */
-/*   Updated: 2024/11/25 16:06:06 by lamhal           ###   ########.fr       */
+/*   Updated: 2024/11/25 19:19:39 by lamhal           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,6 +180,46 @@ void    render_rays(t_data *data, double ang)
 	}
 }
 
+void	find_pixel(double hght, int *top, int *bottum)
+{	
+	if (hght > S_H)
+	{
+		*top = 0;
+		*bottum = S_H;
+	}
+	else
+	{
+		*top = S_H / 2 - hght / 2;
+		*bottum = S_H / 2 + hght / 2;
+	}	
+}
+
+void	render(t_data *data, double ray, int i)
+{
+	double	wall_hght;
+	double	dst;
+	int	top;
+	int	bottum;
+	int	j;
+
+	data->ray_dst *= cos(ray - data->ang);
+	dst = S_H / (tan(M_PI / 6) * 2);
+	wall_hght = TILE_SIZE * dst / data->ray_dst;
+	find_pixel(wall_hght, &top, &bottum);
+	j = -1;
+	while (++j < S_H)
+	{
+		if (j < top)
+			mlx_put_pixel(data->mlx.img_r, i, j, 0x0000FFFF);
+		else if (j <= bottum && data->ver)
+			mlx_put_pixel(data->mlx.img_r, i, j, 0xFFFF00FF);
+		else if (j <= bottum)
+			mlx_put_pixel(data->mlx.img_r, i, j, 0x00FF00FF);
+		// else
+			// mlx_put_pixel(data->mlx.img_r, i, j, 0x00FF00FF);
+	}
+}
+
 void	ray_cast(t_data	*data)
 {
 	int		i;
@@ -191,7 +231,7 @@ void	ray_cast(t_data	*data)
 	fov = M_PI / 3;
 	i = -1;
 	first_ray = data->ang - fov / 2;
-	while (++i < 300)
+	while (++i <= S_W)
 	{
 		data->ver = 0;
 		first_ray = ft_normalize(first_ray);
@@ -204,11 +244,11 @@ void	ray_cast(t_data	*data)
 			data->ray_dst = h_inter;
 			data->ver = 1;
 		}
-		render_rays(data, first_ray);
-		// printf("ray dst %f\n", data->ray_dst);
-		// render(data, first_ray, i);
-		first_ray += fov / 300;
+		// render_rays(data, first_ray);
+		render(data, first_ray, i);
+		first_ray += fov / S_W;
 	}
+    mlx_image_to_window(data->mlx.mlx_p, data->mlx.img_r, 0, 0);
 }
 
 

@@ -6,7 +6,7 @@
 /*   By: lamhal <lamhal@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/16 18:18:35 by yessemna          #+#    #+#             */
-/*   Updated: 2024/11/25 12:01:31 by lamhal           ###   ########.fr       */
+/*   Updated: 2024/11/26 10:17:48 by lamhal           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,12 +24,13 @@
 # include "../MLX42/include/MLX42/MLX42.h"
 # define HEXA "0123456789abcdef"
 # define HEXA_MAJ "0123456789ABCDEF"
-# define S_W 800 // screen width
-# define S_H 400 // screen height
+# define S_W 1300 // screen width
+# define S_H 800 // screen height
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 10
 # endif
-#define TILE_SIZE 64
+# define TILE_SIZE 64
+# define mov_speed 20
 
 
 
@@ -218,6 +219,8 @@ void	ray_cast(t_data	*data);
 t_player   pos_in_map(t_player pl);
 double	ft_normalize(double ang);
 double	set_angle(t_player pl);
+int	ray_datiction_dwn(double ang);
+int	ray_dariction_right(double ang);
 
 
 #endif
