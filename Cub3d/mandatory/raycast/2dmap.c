@@ -6,7 +6,7 @@
 /*   By: lamhal <lamhal@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 16:02:22 by lamhal            #+#    #+#             */
-/*   Updated: 2024/11/26 11:55:45 by lamhal           ###   ########.fr       */
+/*   Updated: 2024/11/27 20:55:00 by lamhal           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,11 +90,11 @@ void	draw_player(mlx_image_t *img, int x_pl, int y_pl)
 	int	x;
 	int	y;
 
-	raduis = 4;
-	y = -4;
+	raduis = 2;
+	y = -2;
 	while(y < raduis)
 	{
-		x = -4;
+		x = -2;
 		while (x < raduis)
 		{
 			if (x * x + y * y <= raduis * raduis)
@@ -114,8 +114,8 @@ void	render_2d(t_data *data)
 	data->tmp_pl.y = data->player.y * data->unite;
 	draw_player(data->mlx.img_m, data->tmp_pl.x, data->tmp_pl.y);
 	
-	ray_cast(data);
-    mlx_image_to_window(data->mlx.mlx_p, data->mlx.img_m, 0, 0);
+	//ray_cast(data);
+    mlx_image_to_window(data->mlx.mlx_p, data->mlx.img_m, 10, 10);
 }
 
 uint32_t	get_coller(int	r, int g, int b, int a)
@@ -194,7 +194,7 @@ void	handell_keys(void *pram)
 		data->ang += M_PI / 50;
 	data->ang = ft_normalize(data->ang);
 	clear_image(data);
-	// render_2d(data);
+	render_2d(data);
 	ray_cast(data);
 }
 
@@ -203,12 +203,13 @@ void	start_game(t_data *data)
 	data->player = pos_in_map(data->player);
     data->ang = set_angle(data->player);
     data->mlx.mlx_p = mlx_init(S_W, S_H, "cub3d", 0);
-    // data->mlx.img_m = mlx_new_image(data->mlx.mlx_p, S_W, S_H);
+    data->mlx.img_m = mlx_new_image(data->mlx.mlx_p, 450, 200);
     data->mlx.img_r = mlx_new_image(data->mlx.mlx_p, S_W, S_H);
 	data->scale = calculate_scale(data);
+	printf ("scale %f\n", data->scale);
 	data->unite = data->scale / TILE_SIZE;
+	// ray_cast(data);
 	// render_2d(data);
-	ray_cast(data);
     mlx_loop_hook(data->mlx.mlx_p, handell_keys, data);
     mlx_loop(data->mlx.mlx_p);
 }
